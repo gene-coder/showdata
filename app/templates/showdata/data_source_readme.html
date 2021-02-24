@@ -1,0 +1,53 @@
+{% extends '/head/head.html' %}
+
+{% block main %}
+
+<div class="layui-side layui-bg-black">
+  <div class="layui-side-scroll">
+    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <li class="layui-nav-item layui-nav-itemed"></li>
+
+      {% for type1 in dict_nav %}
+      <li class="layui-nav-item">
+        <a class="" href="javascript:;">{{ type1 }}</a>
+        <dl class="layui-nav-child">
+          {% for type2 in dict_nav[type1] %}
+          <dd><a class="show" href="/showdata/show_confure/{{  dict_nav[type1][type2]['url'] }}">{{
+              dict_nav[type1][type2]["name"] }} </a>
+          </dd>
+          {% endfor %}
+        </dl>
+        {% endfor %}
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="layui-body ">
+  <p align="center" style="font-size: 60px">readme</p>
+  <div class="layui-collapse">
+    <div class="layui-colla-item">
+      <h2 class="layui-colla-title">注意事项</h2>
+      <div class="layui-colla-content layui-show">
+        1、为了通用性，sql的结果最好转为字符串
+      </div>
+      <div class="layui-colla-content layui-show">
+        2、必须保证列名个数与sql结果的列数相同，列名以“,”分割，注意最后一个字符不要是","
+      </div>
+    </div>
+    <div class="layui-collapse">
+      <div class="layui-colla-item">
+        <h2 class="layui-colla-title">常用sql函数</h2>
+        <div class="layui-colla-content layui-show">
+          1、mysql返回当前时间，now()
+        </div>
+        <div class="layui-colla-content layui-show">
+          2、mysql将时间转换为字符串，select DATE_FORMAT(NOW(),'%y-%m-%d %k:%i:%s')
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="layui-footer layui-bg-black">欢迎使用</div>
+    {% endblock %}

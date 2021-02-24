@@ -1,0 +1,122 @@
+{% extends '/head/head.html' %}
+
+{% block main %}
+
+<div class="layui-side layui-bg-black">
+  <div class="layui-side-scroll">
+    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <li class="layui-nav-item layui-nav-itemed"></li>
+
+      {% for type1 in dict_nav %}
+      <li class="layui-nav-item">
+        <a class="" href="javascript:;">{{ type1 }}</a>
+        <dl class="layui-nav-child">
+          {% for type2 in dict_nav[type1] %}
+          <dd><a class="show" href="/showdata/show_confure/{{  dict_nav[type1][type2]['url'] }}">{{
+              dict_nav[type1][type2]["name"] }} </a>
+          </dd>
+          {% endfor %}
+        </dl>
+        {% endfor %}
+      </li>
+      <!-- <li class="layui-nav-item"><a href="">云市场</a></li>
+      <li class="layui-nav-item"><a href="">发布商品</a></li> -->
+    </ul>
+  </div>
+</div>
+<div class="layui-body ">
+
+
+  <div class="layui-card">
+    <div class="layui-card-header">
+      <h1 id="page_title">维护页面数据_{{ page_title }}</h1>
+    </div>
+  </div>
+  <form class="layui-form" method="post" action="/showdata/confure/save">
+    <div class="layui-form-item">
+      <label class="layui-form-label">文件名：</label>
+      <div class="layui-input-block">
+        <input type="text" name="filename" readonly="readonly" lay-verify="title" autocomplete="off" class="layui-input"
+          value={{ file_serial }}>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">数据库：</label>
+      <div class="layui-input-inline">
+        <select id='databaseid' name="dataid" lay-verify="required">
+          <option value=""></option>
+          {% for i in databases %}
+          <option value="{{ i }}">{{ i }} </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">列名：</label>
+      <div class="layui-input-block">
+        <input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input" value={{
+          title_sql }}>
+      </div>
+    </div>
+
+
+    <div class="layui-form-item">
+      <div id="col_select_div" class="layui-inline">
+        <label class="layui-form-label">列筛选：</label>
+        <div class="layui-input-block">
+          <input type="checkbox" id="col_select" name="col_select" title="开启" value="checked"  {{ dict_all.col_select }}>
+        </div>
+      </div>
+
+      <div id="col_select_name" class="layui-inline">
+        <label class="layui-form-label">筛选列名：</label>
+        <div class="layui-input-inline">
+          <input type="text" name="col_select_name" autocomplete="on" class="layui-input" style="width:300px" value={{ dict_all.col_select_name }}>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+      <label class="layui-form-label">编写sql：</label>
+      <div class="layui-input-block">
+        <pre class="layui-code" lay-title="JavaScript" lay-skin="notepad">
+          <textarea name="sql" placeholder="请输入内容"  rows="10" class="layui-textarea">{{ sql }}</textarea>
+        </pre>
+        <!-- <textarea name="sql" placeholder="请输入内容" class="layui-textarea">{{ sql }}</textarea> -->
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>
+  </form>
+ 
+  <script>
+    $("#confure_page").show();
+    if ($("#col_select").is(":checked") == true) {
+      $("#col_select_name").show();
+    } else {
+      $("#col_select_name").hide();
+    }
+
+    $("#col_select_div").click(function () {
+      $("#col_select_name").hide();
+      if ($("#col_select").is(":checked") == true) {
+        $("#col_select_name").show();
+      } else {
+        $("#col_select_name").hide();
+      }
+    });
+
+    $("#databaseid").val("{{ dataid }}");
+    $("#page_title").text("维护页面数据" + $(this).text());
+    layui.use('form', function () {
+      var form = layui.form;
+      form.render();
+    });
+  </script>
+  <div class="layui-footer layui-bg-black">欢迎使用</div>
+  {% endblock %}

@@ -1,0 +1,238 @@
+{% extends '/head/head.html' %}
+
+{% block main %}
+<div class="layui-body">
+  <div class="layui-row">
+    <div class="layui-col-xs10">
+      <h1 align="center">配置数据类型</h1>
+      <button id="add" type="button" class="layui-btn">
+        <i class="layui-icon">&#xe608;</i> 添加
+      </button>
+      <div style="text-align: center;">
+        <div class="layui-inline">
+          <table class="layui-table">
+            <colgroup>
+              <col width="20%">
+              <col width="20%">
+              <col width="10%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>数据库标识</th>
+                <th>数据库类型</th>
+                <th>主机</th>
+                <th>端口</th>
+                <th>用户名</th>
+                <th>数据库名</th>
+                <td colspan="3" align="center">操作</td>
+              </tr>
+            </thead>
+            {% for type1 in dict_nav %}
+
+            <tr>
+              <td>{{ dict_nav[type1]["get_dataid"] }}</td>
+              <td>{{ dict_nav[type1]["get_datatype"] }}</td>
+              <td>{{ dict_nav[type1]["get_dataip"] }}</td>
+              <td>{{ dict_nav[type1]["get_dataport"] }}</td>
+              <td>{{ dict_nav[type1]["get_datausr"] }}</td>
+              <td>{{ dict_nav[type1]["get_database"] }}</td>
+              <td><button id="btn_delete" class="layui-btn layui-btn-danger layui-btn-sm" value={{ type1 }}>删除</button>
+              </td>
+              <td><button id="btn_test" class="layui-btn layui-btn-normal layui-btn-sm" value={{ type1 }}>测试</button>
+              </td>
+              <td><button id="btn_chage" class="layui-btn layui-btn-warm layui-btn-sm " value={{ type1 }}>修改</button>
+              </td>
+            </tr>
+
+            {% endfor %}
+          </table>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <form class="layui-form" method="post" id="test" style="display:none" action="/showdata/add_database/save">
+    <div class="layui-form-item">
+      <label class="layui-form-label">数据库标识</label>
+      <div class="layui-input-block">
+        <input type="text" id="dataid" name="dataid" required lay-verify="required" autocomplete="on"
+          class="layui-input" style="width:200px">
+      </div>
+    </div>
+    <div class="layui-form-item" style="width:200">
+      <label class="layui-form-label">数据库类型</label>
+      <div class="layui-input-block">
+        <select name="datatype" id="datatype"  lay-filter="datatype">
+          <option value="MYSQL">MYSQL</option>
+          <option value="ORACLE">ORACLE</option>
+          <!-- <option value="ORACLE">ORACLE</option> -->
+        </select>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">IP地址</label>
+        <div class="layui-input-inline">
+          <input type="text" id="dataip" name="dataip" required lay-verify="required" autocomplete="on"
+            class="layui-input" style="width:150px">
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label">端口</label>
+        <div class="layui-input-inline">
+          <input type="text" id="dataport" name="dataport" required lay-verify="required" autocomplete="on"
+            class="layui-input" style="width:60px">
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label id="lable_database" class="layui-form-label">数据库名</label>
+        <div class="layui-input-inline">
+          <input type="text" id="database" name="database" required lay-verify="required" autocomplete="on"
+            class="layui-input" style="width:60px">
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+          <input type="text" id="datausr" name="datausr" required lay-verify="required" autocomplete="on"
+            class="layui-input" style="width:150px">
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+          <input type="password" id="datapwd" name="datapwd" required lay-verify="required" autocomplete="on"
+            class="layui-input" style="width:100px">
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-block">
+        <textarea lay-verify="required" id="datadesc" name="datadesc" class="layui-textarea"></textarea>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>
+  </form>
+  <script>
+  //  下来框
+  layui.use(['layer', 'jquery', 'form'], function () {
+			var layer = layui.layer,
+					$ = layui.jquery,
+					form = layui.form;
+			form.on('select(datatype)', function(data){
+				if(data.value == "MYSQL"){
+          $("#lable_database").html("数据库名")
+					form.render('select');
+				}else if (data.value == "ORACLE") {
+					$("#lable_database").html("SID")
+					form.render('select');//select是固定写法 不是选择器
+				} else{
+          alert("数据库错误");
+          form.render('select');
+        }
+			});
+		});
+    // 删除
+    $(".layui-btn.layui-btn-danger.layui-btn-sm").click(function () {
+      bnt_value = $(this).attr("value");
+      // alert(bnt_value);
+      layer.confirm('确认删除   '+bnt_value+'  吗?', { icon: 3, title: '提示' }, function (index) {
+        //do something
+        $.get("/showdata/add_database/del/" + bnt_value, function (data, status) {
+            location.reload();
+          });
+        // layer.close(index);
+      });
+    });
+    // 测试
+    $(".layui-btn.layui-btn-normal.layui-btn-sm").click(function () {
+      bnt_value = $(this).attr("value");
+      var loading = layer.load(2, {
+        shade: false,
+      });
+      $.get("/showdata/add_database/btn_test/" + bnt_value, function (data, status) {
+        alert(data);
+        location.reload();
+      });
+    });
+
+    // 修改
+    $(".layui-btn.layui-btn-warm.layui-btn-sm").click(function () {
+      bnt_value = $(this).attr("value");
+      // alert(bnt_value);
+      $.get("/showdata/add_database/chage/" + bnt_value, function (data, status) {
+        console.log(data);
+        var $ = jQuery = layui.jquery;
+        layer.open({
+          type: 1,
+          area: ['1000', '500px'],
+          title: "修改信息",
+          btn: '关闭全部',
+          btnAlign: 'c',
+          content: $('#test'),
+          shade: 0,
+          yes: function (index, layero) {
+            layer.closeAll();
+          },
+          success: function (layero, index) {
+            $('#dataid').val(data.get_dataid);
+            $('#dataid').attr("readonly","readonly");
+            // $('#datatype').val(data.get_datatype);
+            $("select[name='datatype']").val(data.get_datatype);
+            layui.form.render('select');
+            $('#dataip').val(data.get_dataip);
+            $('#dataport').val(data.get_dataport);
+            $('#database').val(data.get_database);
+            $('#datausr').val(data.get_datausr);
+            $('#datapwd').val(data.get_datapwd);
+            $('#datadesc').val(data.get_datadesc);
+          },
+          end: function () {
+            window.location.reload();
+          }
+
+        });
+
+      });
+    });
+    // 新增
+    var $ = jQuery = layui.jquery;
+    $("#add").click(function () {
+      $('#dataid').removeAttr("readonly");
+      layer.open({
+        type: 1,
+        area: ['1000px', '500px'],
+        title: "新增数据库",
+        btn: '关闭全部',
+        btnAlign: 'c',
+        content: $('#test'),
+        shade: 0,
+        yes: function (index, layero) {
+          layer.closeAll();
+        },
+        end: function () {
+            window.location.reload();
+          }
+      });
+    });
+  </script>
+  <script>
+    layui.use('form', function () { //是下来框等可视化
+      var form = layui.form;
+      form.render();
+    });
+  </script>
+
+  {% endblock %}

@@ -1,0 +1,169 @@
+{% extends '/head/head.html' %}
+
+{% block main %}
+
+<div class="layui-side layui-bg-black">
+  <div class="layui-side-scroll">
+    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <li class="layui-nav-item layui-nav-itemed"></li>
+
+      {% for type1 in dict_nav %}
+      <li class="layui-nav-item">
+        <a class="" href="javascript:;">{{ type1 }}</a>
+        <dl class="layui-nav-child">
+          {% for type2 in dict_nav[type1] %}
+          <dd><a class="show" hef="/showdata/show_page/{{  dict_nav[type1][type2]['url'] }}"
+              url="{{  dict_nav[type1][type2]['url'] }}">{{
+              dict_nav[type1][type2]["name"] }} </a>
+          </dd>
+          {% endfor %}
+        </dl>
+        {% endfor %}
+      </li>
+      <!-- <li class="layui-nav-item"><a href="">云市场</a></li>
+      <li class="layui-nav-item"><a href="">发布商品</a></li> -->
+    </ul>
+  </div>
+</div>
+<div class="layui-body ">
+
+  <h1 id="page_title">展示数据</h1>
+
+  <div id="showdata_readme" class="layui-collapse">
+    <div class="layui-colla-item">
+      <h2 class="layui-colla-title">说明</h2>
+      <div class="layui-colla-content layui-show">
+        1、点击右上角“配置信息”--“显示维护页面”，开始维护要显示的数据
+      </div>
+      <!-- 注释或者删除以下内容，可不显示密码 -->
+      <div class="layui-colla-content layui-show">
+        <pre>  初始密码：showdata 。打开show_data.html,注释或删除该段，可不显示密码</pre>
+      </div>
+
+      <div class="layui-colla-content layui-show">
+        2、维护顺序为，数据库（配置数据库）--页面（配置数据类型）--显示内容（配置暂时数据）
+      </div>
+      <div class="layui-colla-content layui-show">
+        3、目前仅支持mysql数据库，之后会添加对oracle等数据库以及图标展示的支持
+      </div>
+    </div>
+  </div>
+
+
+  <div id="demo_select" class="demo_select">
+    <!-- 放置位置 -->
+    <p id="position"></p>
+    <button id="search" class="layui-btn" data-type="reload">搜索</button>
+  </div>
+  <table id="demo" lay-filter="test"></table>
+
+</div>
+
+<script>
+  $("#demo_select").hide();
+
+
+  $(document).ready(function () {
+    $(".show").click(function () {
+       $("#showdata_readme").hide();
+
+      $(".layui-inline").remove();
+      var file_url = $(this).attr("url");
+      $("#page_title").text("展示数据----" + $(this).text())
+      $.get("/showdata/show_page/colname/" + file_url, function (data, status) {
+      
+        // 显示筛选列
+        if (data["col_select"] == "checked") {
+
+          $("#demo_select").show();
+          var col_select_name = data["col_select_name"].split(",");
+          for (var i = 0; i < col_select_name.length; i++) {
+            // alert(col_select_name[i]);
+            $("#search").before('<div class="layui-inline">'
+              + '<label class="layui-form-label">' + col_select_name[i] + '</label>'
+              + '<div class="layui-input-inline">'
+              + '<input type="text" id="' + col_select_name[i] + '" name="' + col_select_name[i] + '"  class="layui-input">'
+              + '</div></div>'
+            );
+
+          }
+          // 生成筛选列
+        } else {
+          $("#demo_select").hide();
+        }
+
+        // 显示数据
+        layui.use('table', function () {
+
+          var table = layui.table;
+          // 展示数据的列
+          var cols_list = data["title"].split(',');
+          var cols_name = [];
+          cols_name[0] = [];
+          cols_name[0][0] = { type: 'numbers', width: 80, title: '序号', sort: 'true', fixed: 'left' };
+          for (var i = 1; i < cols_list.length + 1; i++)  // x 为属性名
+          {
+            cols_name[0][i] = { field: cols_list[i - 1], title: cols_list[i - 1] };
+          }
+
+
+          //展示数据
+          table.render({
+            elem: '#demo'
+            , height: 'full-200'
+            , cellMinWidth: 80
+            , url: '/showdata/show_page/data/' + file_url //数据接口
+            , method: 'get'
+            , page: true //开启分页
+            , limit: 50
+            , limits: [50, 100, 150]
+            , cellMinWidth: 80
+            , id: 'testReload'
+            , cols: cols_name
+            // , cols: [[{type: 'numbers', title: '序号', sort: 'true', fixed: 'left'}, {field: 'sbbh', title: 'sbbh'}, {field: 'hphm', title: 'hphm'}, {field: 'sex', title: 'sex'}]]
+          });
+
+          // 数据重载，筛选
+          var $ = layui.$, active = {
+
+            reload: function () {
+              // 获取筛选列
+              col_select_name_list = {};
+              for (var i = 0; i < col_select_name.length; i++) {
+                var key = col_select_name[i];
+                // var value = '$("#' + key + '").val()';
+                var value = $('#' + key);
+                col_select_name_list[key] = value.val();
+              }
+              console.log(col_select_name_list);
+              //执行重载
+              table.reload('testReload', {
+                page: {
+                  curr: 1
+                }
+                , where: {
+                  key: col_select_name_list
+                }
+              }, 'data');
+            }
+          };
+
+          $('#search').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+          });
+        });
+
+
+
+
+      });
+
+    });
+  }
+  );
+</script>
+
+<div class="layui-footer layui-bg-black">欢迎使用</div>
+{% endblock %}

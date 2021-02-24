@@ -1,0 +1,75 @@
+{% extends '/head/head.html' %}
+
+{% block main %}
+<div class="layui-body">
+  <div class="layui-row">
+    <div class="layui-col-xs10">
+      <h1 align="center">配置数据类型</h1>
+      <button id="add" type="button" class="layui-btn">
+        <i class="layui-icon">&#xe608;</i> 添加
+      </button>
+      <div style="text-align: center;">
+        <div class="layui-inline">
+          <table class="layui-table">
+            <colgroup>
+              <col width="20%">
+              <col width="20%">
+              <col width="10%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>数据分类</th>
+                <th>数据页面</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            {% for type1 in dict_nav %}
+            {% for type2 in dict_nav[type1] %}
+            <tr>
+              <td>{{ type1 }}</td>
+              <td>{{ dict_nav[type1][type2]["name"] }}</td>
+              <td><button id="btn" class="layui-btn layui-btn-sm" value={{ dict_nav[type1][type2]["url"] }}>删除</button>
+              </td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+          </table>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    layui.use(["form", "table"], function () {
+
+    });
+    $(".layui-btn.layui-btn-sm").click(function () {
+      bnt_value = $(this).attr("value");
+      $.get("/showdata/show_page/del/" + bnt_value, function (data, status) {
+        alert(data);
+        location.reload();
+      });
+    });
+
+    $("#add").click(function () {
+      layer.open({
+        type: 1,
+        title: "新增",
+        area: ['50%', '50%'],
+        btn: '关闭全部',
+        btnAlign: 'c',
+        content: '<form  method="post" class="layui-form" action="/showdata/show_page/save">         <div class="layui-form-item">           <label class="layui-form-label">数据类型</label>           <div class="layui-input-block">             <input type="text" name="type" required  lay-verify="required" placeholder="请输入类型" autocomplete="off" class="layui-input" style="width:200px">           </div>         </div>         <div class="layui-form-item">           <label class="layui-form-label">数据页面</label>           <div class="layui-input-inline">             <input type="text" name="page" required lay-verify="required" placeholder="请输入页面" autocomplete="off" class="layui-input" style="width:200px">           </div>         </div>         <div class="layui-form-item">           <div class="layui-input-block">             <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>             <button type="reset" class="layui-btn layui-btn-primary">重置</button>           </div>         </div> </form>',
+        yes: function (index, layero) {
+          layer.closeAll();
+        }
+      });
+    })
+  </script>
+
+
+
+
+  {% endblock %}

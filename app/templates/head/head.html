@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>数据展示{% block title%}{{ title }}{%endblock%}</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
+  <script src="{{ url_for('static',filename='layui/layui.all.js') }}"></script>
+  <script src="{{ url_for('static',filename='jquery/jquery-3.5.1.min.js') }}"></script>
+</head>
+
+<body class="layui-layout-body">
+  <div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+      <div class="layui-logo">数据展示</div>
+      <!-- 头部区域（可配合layui已有的水平导航） -->
+      <ul class="layui-nav layui-layout-left">
+        <li class="layui-nav-item"><a href="/">首页</a></li>
+        <li class="layui-nav-item"><a href="/showdata">显示数据</a></li>
+        <!-- <li class="layui-nav-item"><a href="">用户</a></li> -->
+
+        <!-- <li class="layui-nav-item"><a href="/all_test/test">测试</a></li> -->
+      </ul>
+      <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+          <a id='confure_page' style="background-color: brown;">维护页面</a>
+          <dl class="layui-nav-child">
+            <dd><a href="/showdata/add_database">配置数据库</a></dd>
+            <dd><a href="/showdata/add_tree">配置数据类型</a></dd>
+            <dd><a href="/showdata/data_source">配置展示数据</a></dd>
+            <!-- <dd><a href="">授权管理</a></dd> -->
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">配置信息</a>
+          <dl class="layui-nav-child">
+            <dd><a id='show_confure'>显示维护页面</a></dd>
+            <!-- <dd><a href="">安全设置</a></dd> -->
+          </dl>
+        </li>
+
+        <li class="layui-nav-item" id="donate">
+          &nbsp;&nbsp;<i class="layui-icon layui-icon-rmb" style="font-size: 15px; color:chocolate;">donate</i>
+        </li>
+        <!-- <li class="layui-nav-item"><a href="">退了</a></li> -->
+      </ul>
+    </div>
+    
+    {% block main%}
+
+    {%endblock%}
+
+    <script>
+      // 捐赠页面
+      $("#donate_pic").hide();
+      $("#donate").click(function () {
+      layer.open({
+        type: 1,
+        title: false,
+        closeBtn: 0,
+        area: ['auto'],
+        skin: 'layui-layer-nobg', //没有背景色
+        shadeClose: true,
+        content:'<img src="/static/pay.png" height="271" width="420"> </img>'
+      });
+      
+    });
+    $("#donate_pic").hide();
+      // 判断是否隐藏配置页面
+      var pageURL = $(location).attr("href");
+      var url_list = pageURL.split('/');
+      var url = url_list[4];
+      // 显示的页面
+      var show_url = new Array("add_database", "add_tree", "confure", "data_source", "show_confure", "show_page")
+      if (show_url.indexOf(url) > -1) {
+        $("#confure_page").show();
+        $("#show_confure").text("隐藏维护页面");
+      } else {
+        $("#confure_page").hide();
+        $("#show_confure").text("显示维护页面");
+      };
+      // 显示配置页面
+      $("#show_confure").click(function () {
+        $(function () {
+          if ($("#show_confure").text() == "显示维护页面") {
+            var judge = prompt("请输入密码");
+            // 输入密码，生产环境中，密码可以设置为后台设置并可更新。do not be evil
+            // 此处密码为showdata
+            if (judge == "showdata") {
+              $("#confure_page").show();
+              $("#show_confure").text("隐藏维护页面");
+            } else {
+              alert("密码错误！")
+            }
+          } else {
+            $("#confure_page").hide();
+            $("#show_confure").text("显示维护页面");
+          }
+        })
+      });
+
+
+      layui.use('element', function () {
+        var element = layui.element;
+        element.init();
+
+      });
+
+    </script>
+</body>
+
+</html>
+
+</html>
